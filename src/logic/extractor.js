@@ -5,9 +5,9 @@ import * as traverse from "traverse";
 import * as FileSaver from "file-saver";
 import moment from "moment";
 
-import {store} from "../store";
-import * as actionTypes from "../actions/actionTypes";
-import * as settingsAction from "../actions/settingsAction";
+import {store} from '../redux/store';
+import * as actionTypes from "../redux/actions";
+import * as settingsAction from "../redux/actions/settingsAction";
 import * as configuration from "./configuration";
 
 axiosRetry(axios, { retries: 10 });

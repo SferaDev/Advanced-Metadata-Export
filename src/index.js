@@ -1,78 +1,84 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import _ from 'lodash';
+import React from "react";
+import ReactDOM from "react-dom";
+import _ from "lodash";
+import { init, config, getUserSettings, getManifest } from "d2";
+import "font-awesome/css/font-awesome.min.css";
+import {HashRouter} from "react-router-dom";
 import {Provider} from "react-redux";
-import * as D2Library from "d2";
 
-import * as actionTypes from "./actions/actionTypes";
-import App from './components/App.js';
-import {store} from "./store";
-import './index.css';
-import {Extractor} from "./logic/extractor";
+import App from "./components/app/App";
+import i18n from "./locales";
+import {store} from "./redux/store";
 
-const DEBUG = process.env.REACT_APP_DEBUG;
+function isLangRTL(code) {
+    const langs = ["ar", "fa", "ur"];
+    const prefixed = langs.map(c => `${c}-`);
+    return langs.includes(code) || prefixed.filter(c => code.startsWith(c)).length > 0;
+}
 
-D2Library.getManifest('manifest.webapp').then((manifest) => {
-    let config = {};
+function configI18n(userSettings) {
+    const uiLocale = userSettings.keyUiLocale;
 
-    // Set baseUrl
-    config.baseUrl = manifest.activities !== undefined ? manifest.activities.dhis.href + '/api'
-        : process.env.REACT_APP_DHIS2_BASE_URL !== undefined ? process.env.REACT_APP_DHIS2_BASE_URL + '/api'
-            : config.baseUrl = window.location.href.includes('/api') ? window.location.href.split('/api')[0] + '/api'
-                : undefined;
-
-    // Set credentials
-    if (process.env.REACT_APP_DEBUG === 'true') {
-        console.log('Starting React App in DEBUG mode with user: ' + process.env.REACT_APP_DHIS2_USERNAME);
-        config.headers = {
-            Authorization: "Basic " + btoa(process.env.REACT_APP_DHIS2_USERNAME + ':' + process.env.REACT_APP_DHIS2_PASSWORD)
-        }
+    if (uiLocale && uiLocale !== "en") {
+        config.i18n.sources.add(`./i18n/i18n_module_${uiLocale}.properties`);
     }
 
-    // Init library
-    D2Library.init(config).then(d2 => {
-        if (DEBUG) console.log({url: config.baseUrl, d2: d2});
-        store.dispatch({type: 'SET_D2', d2});
-        parseMetadataTypes(d2);
-        Extractor.getInstance().init({
-            d2,
-            debug: DEBUG
-        });
-        ReactDOM.render(
-            <Provider store={store}>
-                <App d2={d2} />
-            </Provider>, document.getElementById('root')
-        );
-    });
-}).catch((error) => {
-    console.error('D2 initialization error:', error);
-    ReactDOM.render((<div>Failed to connect with D2</div>), document.getElementById('root'));
-});
+    config.i18n.sources.add("./i18n/i18n_module_en.properties");
+    document.documentElement.setAttribute("dir", isLangRTL(uiLocale) ? "rtl" : "ltr");
 
-function parseMetadataTypes(d2) {
-    let metadataTypes = _.uniq(Object.keys(d2.models).filter(model => {
-        return d2.models[model].isMetaData;
-    }).map(model => {
-        return d2.models[model].name
-    }));
-    let parsedElements = metadataTypes.length;
-    let insertMetadata = (model, result) => {
-        let metadata = result.toArray().filter(e => e.code !== 'default').map(e => {
-            return {
-                id: e.id,
-                name: e.displayName,
-                type: model
-            };
-        });
-        store.dispatch({type: actionTypes.GRID_ADD_METADATA, metadata});
-        if (result.pager.hasNextPage()) result.pager.getNextPage().then(result => insertMetadata(model, result));
-    };
-    metadataTypes.forEach((model) => {
-        d2.models[model].list({paging: false, fields: ['id', 'displayName', 'code']}).then(result => {
-            insertMetadata(model, result);
-            if (--parsedElements === 1) store.dispatch({type: actionTypes.LOADING, loading: false});
-        }).catch(() => {
-            if (--parsedElements === 1) store.dispatch({type: actionTypes.LOADING, loading: false});
-        });
-    });
+    i18n.changeLanguage(uiLocale);
 }
+
+async function getBaseUrl() {
+    if (process.env.NODE_ENV === "development") {
+        const envVariable = "REACT_APP_DHIS2_BASE_URL";
+        const defaultServer = "http://localhost:8080";
+        const baseUrl = process.env[envVariable] || defaultServer;
+        console.info(`[DEV] DHIS2 instance: ${baseUrl}`);
+        return baseUrl;
+    } else {
+        const manifest = await getManifest("./manifest.webapp");
+        return manifest.getBaseUrl();
+    }
+}
+
+function loadHeaderBarTranslations(d2) {
+    const keys = _(["app_search_placeholder", "manage_my_apps", "no_results_found"]);
+    keys.each(s => d2.i18n.strings.add(s));
+    d2.i18n.load();
+}
+
+async function main() {
+    const baseUrl = await getBaseUrl();
+    const apiUrl = baseUrl.replace(/\/*$/, "") + "/api";
+    try {
+        const d2 = await init({ baseUrl: apiUrl });
+        window.d2 = d2; // Make d2 available in the console
+        await loadHeaderBarTranslations(d2);
+        const userSettings = await getUserSettings();
+        configI18n(userSettings);
+        ReactDOM.render(
+            <HashRouter>
+                <Provider store={store}>
+                    <App d2={d2} />
+                </Provider>
+            </HashRouter>,
+            document.getElementById("root")
+        );
+    } catch (err) {
+        console.error(err);
+        const message = err.toString().match("Unable to get schemas") ? (
+            <div>
+                <a rel="noopener noreferrer" target="_blank" href={baseUrl}>
+                    Login
+                </a>{" "}
+                {baseUrl}
+            </div>
+        ) : (
+            err.toString()
+        );
+        ReactDOM.render(<div>{message}</div>, document.getElementById("root"));
+    }
+}
+
+main();

@@ -1,0 +1,74 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: i18next-conv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"POT-Creation-Date: 2019-04-09T08:54:07.197Z\n"
+"PO-Revision-Date: 2019-04-09T08:54:07.197Z\n"
+
+msgid "Advanced Metadata Export"
+msgstr ""
+
+msgid "Metadata Export"
+msgstr ""
+
+msgid "Metadata Import"
+msgstr ""
+
+msgid "Admin Panel"
+msgstr ""
+
+msgid "DHIS2 Import/Export App"
+msgstr ""
+
+msgid "Help"
+msgstr ""
+
+msgid "Back"
+msgstr ""
+
+msgid "Previous"
+msgstr ""
+
+msgid "Next"
+msgstr ""
+
+msgid "Metadata"
+msgstr ""
+
+msgid "Select the metadata to export"
+msgstr ""
+
+msgid "JSON Editor"
+msgstr ""
+
+msgid "Edit the metadata package"
+msgstr ""
+
+msgid "Review"
+msgstr ""
+
+msgid "Review, download, store or import the metadata package"
+msgstr ""
+
+msgid "Ok"
+msgstr ""
+
+msgid "Exit metadata export"
+msgstr ""
+
+msgid ""
+"You are about to exit the metadata export wizard. All your changes will be "
+"lost. Are you sure?"
+msgstr ""
+
+msgid "Options"
+msgstr ""
+
+msgid "Admin"
+msgstr ""
+
+msgid "Clear"
+msgstr ""

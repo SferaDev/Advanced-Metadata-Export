@@ -15,26 +15,33 @@ yarn install
 - Create .env file with the following content
 
 ```
-REACT_APP_DEBUG=true
 REACT_APP_DHIS2_BASE_URL=http://who-dev.essi.upc.edu:8081
-REACT_APP_DHIS2_USERNAME=username
-REACT_APP_DHIS2_PASSWORD=password
 ```
 
 - Launch Chrome with CORS disabled
 
 https://stackoverflow.com/questions/3102819/disable-same-origin-policy-in-chrome
 
-- Execute development server
+## Build
 
 ```
-yarn start
+$ yarn build-webapp
 ```
 
-## Build a release package
+## i18n
 
-- Create a packaged zip
+### Update an existing language
 
 ```
-yarn run build
+$ yarn update-po
+# ... add/edit translations in po files ...
+$ yarn localize
+```
+
+### Create a new language
+
+```
+$ cp i18n/en.pot i18n/es.po
+# ... add translations to i18n/es.po ...
+$ yarn localize
 ```

@@ -1,67 +1,98 @@
 {
-    "name": "advanced-export",
-    "version": "0.2.9",
-    "private": true,
-    "dependencies": {
-        "@devexpress/dx-react-core": "1.4.0",
-        "@devexpress/dx-react-grid": "1.4.0",
-        "@devexpress/dx-react-grid-material-ui": "1.4.0",
-        "@dhis2/d2-ui-core": "5.1.3",
-        "@dhis2/d2-ui-header-bar": "^5.1.3",
-        "@material-ui/core": "^3.9.2",
-        "@material-ui/icons": "^3.0.2",
-        "axios": "^0.18.0",
-        "axios-retry": "^3.1.2",
-        "babel-preset-es2015": "^6.24.1",
-        "babel-preset-stage-2": "^6.24.1",
-        "btoa": "^1.2.1",
-        "classnames": "^2.2.6",
-        "d2": "31.4.0",
-        "d2-manifest": "^1.0.0",
-        "d2-utilizr": "^0.2.16",
-        "file-saver": "^2.0.0",
-        "jquery": "^3.3.1",
-        "lodash": "^4.17.11",
-        "material-ui": "^0.20.2",
-        "moment": "^2.22.2",
-        "prop-types": "^15.7.2",
-        "react": "^16.6.3",
-        "react-dom": "^16.6.3",
-        "react-json-view": "^1.19.1",
-        "react-redux": "^5.0.7",
-        "react-scripts": "^1.1.4",
-        "react-select": "^2.1.2",
-        "react-table": "^6.8.6",
-        "redux": "^4.0.1",
-        "redux-logger": "^3.0.6",
-        "redux-thunk": "^2.3.0",
-        "rxjs": "^5.2.0",
-        "traverse": "^0.6.6"
+  "name": "advanced-export",
+  "description": "",
+  "version": "0.3.0",
+  "license": "GPL-3.0",
+  "author": "Alexis Rico",
+  "dependencies": {
+    "@devexpress/dx-react-core": "1.4.0",
+    "@devexpress/dx-react-grid": "1.4.0",
+    "@devexpress/dx-react-grid-material-ui": "1.4.0",
+    "@dhis2/d2-i18n": "^1.0.4",
+    "@dhis2/d2-i18n-extract": "^1.0.7",
+    "@dhis2/d2-i18n-generate": "^1.0.19",
+    "@dhis2/d2-ui-core": "^1.3.5",
+    "@dhis2/ui": "https://github.com/d2-ci/ui#1.0.0-beta.15",
+    "@material-ui/core": "^3.9.2",
+    "@material-ui/icons": "^3.0.2",
+    "axios": "^0.18.0",
+    "axios-retry": "^3.1.2",
+    "d2": "^31.1.1",
+    "d2-manifest": "^1.0.0",
+    "d2-ui-components": "^0.0.14",
+    "enzyme": "^3.7.0",
+    "enzyme-adapter-react-16": "^1.6.0",
+    "enzyme-to-json": "^3.3.4",
+    "file-saver": "^2.0.0",
+    "font-awesome": "^4.7.0",
+    "lodash": "^4.17.11",
+    "material-ui": "^0.20.2",
+    "moment": "^2.22.2",
+    "postcss-rtl": "^1.3.2",
+    "prop-types": "latest",
+    "react": "^16.6.0",
+    "react-dom": "^16.6.0",
+    "react-json-view": "^1.19.1",
+    "react-jss": "^8.6.1",
+    "react-redux": "^5.0.7",
+    "react-router": "^5.0.0",
+    "react-router-dom": "^5.0.0",
+    "react-scripts": "2.0.6-next.c662dfb0",
+    "react-test-renderer": "^16.8.3",
+    "redux": "^4.0.1",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.3.0",
+    "traverse": "^0.6.6",
+    "nano-memoize": "latest"
+  },
+  "scripts": {
+    "prestart": "yarn localize && d2-manifest package.json manifest.webapp",
+    "start": "BROWSER=false PORT=${PORT:-8085} react-scripts start",
+    "build": "rm -rf build/ && yarn localize && d2-manifest package.json manifest.webapp && react-scripts build && yarn run manifest && cp -r i18n icon.png build",
+    "build-webapp": "yarn build && rm -f $npm_package_name.zip && cd build && zip -r ../$npm_package_name.zip *",
+    "lint": "eslint src",
+    "eject": "react-scripts eject",
+    "prettify": "prettier \"{src,config}/**/*.{js,jsx,json,css}\" --write",
+    "extract-pot": "d2-i18n-extract -p src/ -o i18n/",
+    "localize": "yarn extract-pot && d2-i18n-generate -n advanced-export -p ./i18n/ -o ./src/locales/",
+    "update-po": "yarn extract-pot && for pofile in i18n/*.po; do msgmerge --backup=off -U $pofile i18n/en.pot; done",
+    "manifest": "d2-manifest package.json build/manifest.webapp"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0-0",
+    "@types/node": "^10.12.19",
+    "@types/react": "^16.7.22",
+    "@types/react-dom": "^16.0.11",
+    "babel-core": "7.0.0-bridge.0",
+    "babel-eslint": "9.x",
+    "eslint": "^5.12.1",
+    "eslint-config-prettier": "^3.6.0",
+    "eslint-config-react-app": "^3.0.7",
+    "eslint-plugin-cypress": "^2.2.0",
+    "eslint-plugin-flowtype": "^2.x",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-jsx-a11y": "^6.2.0",
+    "eslint-plugin-react": "^7.12.4",
+    "sinon": "^7.1.1",
+    "typescript": "^3.2.4",
+    "wait-on": "^3.2.0"
+  },
+  "manifest.webapp": {
+    "name": "Advanced Export",
+    "description": "Export App with recursive metadata fetching",
+    "version": "0.3.0",
+    "developer": {
+      "name": "Alexis Rico",
+      "url": "https://github.com/SferaDev"
     },
-    "scripts": {
-        "start": "react-scripts start",
-        "prebuild": "rm -rf advanced-export.zip && rm -rf build/",
-        "build": "react-scripts build",
-        "postbuild": "d2-manifest package.json build/manifest.webapp && cd build && zip -r ../advanced-export.zip . && rm asset-manifest.json && rm service-worker.js && cd ..",
-        "test": "react-scripts test --env=jsdom",
-        "eject": "react-scripts eject"
+    "icons": {
+      "48": "img/import_export.svg"
     },
-    "manifest.webapp": {
-        "name": "Advanced Export",
-        "description": "Export App with recursive metadata fetching",
-        "version": "0.2.9",
-        "developer": {
-            "name": "Alexis Rico",
-            "url": "https://github.com/SferaDev"
-        },
-        "icons": {
-            "48": "img/import_export.svg"
-        },
-        "activities": {
-            "dhis": {
-                "href": "*"
-            }
-        }
-    },
-    "homepage": "."
+    "activities": {
+      "dhis": {
+        "href": "*"
+      }
+    }
+  },
+  "homepage": "."
 }
